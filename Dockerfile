@@ -3,7 +3,8 @@ MAINTAINER skysider <skysider@163.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV TZ Asia/Shanghai
+# Nope
+#ENV TZ Asia/Shanghai
 
 RUN dpkg --add-architecture i386 && \
     apt-get -y update && \
@@ -48,8 +49,10 @@ RUN dpkg --add-architecture i386 && \
 RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
     
-RUN wget https://github.com/radareorg/radare2/releases/download/4.4.0/radare2_4.4.0_amd64.deb && \
-    dpkg -i radare2_4.4.0_amd64.deb && rm radare2_4.4.0_amd64.deb
+# We don't need radare...
+
+#RUN wget https://github.com/radareorg/radare2/releases/download/4.4.0/radare2_4.4.0_amd64.deb && \
+#    dpkg -i radare2_4.4.0_amd64.deb && rm radare2_4.4.0_amd64.deb
 
 RUN python3 -m pip install -U pip && \
     python3 -m pip install --no-cache-dir \
@@ -68,12 +71,17 @@ RUN python3 -m pip install -U pip && \
 
 RUN gem install one_gadget seccomp-tools && rm -rf /var/lib/gems/2.*/cache/*
 
-RUN git clone --depth 1 https://github.com/pwndbg/pwndbg && \
-    cd pwndbg && chmod +x setup.sh && ./setup.sh
+# Replace with GEF
 
-RUN git clone --depth 1 https://github.com/scwuaptx/Pwngdb.git /root/Pwngdb && \
-    cd /root/Pwngdb && cat /root/Pwngdb/.gdbinit  >> /root/.gdbinit && \
-    sed -i "s?source ~/peda/peda.py?# source ~/peda/peda.py?g" /root/.gdbinit
+#RUN git clone --depth 1 https://github.com/pwndbg/pwndbg && \
+#    cd pwndbg && chmod +x setup.sh && ./setup.sh
+
+#RUN git clone --depth 1 https://github.com/scwuaptx/Pwngdb.git /root/Pwngdb && \
+#    cd /root/Pwngdb && cat /root/Pwngdb/.gdbinit  >> /root/.gdbinit && \
+#    sed -i "s?source ~/peda/peda.py?# source ~/peda/peda.py?g" /root/.gdbinit
+
+RUN wget -O ~/.gdbinit-gef.py -q https://github.com/hugsy/gef/raw/master/gef.py && \
+    echo source ~/.gdbinit-gef.py >> ~/.gdbinit
 
 RUN git clone --depth 1 https://github.com/niklasb/libc-database.git libc-database && \
     cd libc-database && ./get ubuntu debian || echo "/libc-database/" > ~/.libcdb_path
